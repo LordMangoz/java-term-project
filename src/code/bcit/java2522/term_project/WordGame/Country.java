@@ -13,9 +13,9 @@ public class Country
     Country(final String name, final String capitalCityName, final String[] facts)
     {
 
-        validateCapitalCityName();
-        validateName();
-        validateFacts();
+        validateCapitalCityName(capitalCityName);
+        validateName(name);
+        validateFacts(facts);
 
         this.name = name;
         this.capitalCityName = capitalCityName;
@@ -28,40 +28,53 @@ public class Country
     * Constraints
     *   - Cannot be null.
     */
-    private void validateFacts()
+    private void validateFacts(final String[] facts)
     {
-
+        if (facts == null)
+        {
+            throw new IllegalArgumentException("Cannot be Null");
+        }
     }
 
     /*
     * Validate the names.
     *
     * Constraints
-    *  -
-    *  -
+    *  - Cannot be null.
+    *  - Cannot empty.
     */
-    private void validateName()
+    private void validateName(final String name)
     {
+        if( name == null ||
+            name.isEmpty())
+        {
+            throw new IllegalArgumentException("Invalid name.");
 
+        }
     }
-
 
     /*
     * Validates the capital city name
     *
     * Constraints
     *  - Cannot be null
-    *  - Cannot be Empty.
+    *  - Cannot be empty.
     */
-    private void validateCapitalCityName()
+    private void validateCapitalCityName(final String capitalCityName)
     {
+        if( capitalCityName == null ||
+                capitalCityName.isEmpty())
+        {
+            throw new IllegalArgumentException("Invalid name.");
 
+        }
     }
 
 
     /**
-     * Getter for the capital city name.
-     * @return capitalCityName.
+     * Gets for the capital city name.
+     *
+     * @return capitalCityName of the country.
      */
     public String getCapitalCityName()
     {
@@ -69,13 +82,19 @@ public class Country
     }
 
     /**
-     * Getter the name.
-     * @return name
+     * Gets the country name.
+     *
+     * @return name of country
      */
     public String getName() {
         return name;
     }
 
+    /**
+     * Getter for country facts.
+     *
+     * @return facts about country.
+     */
     public String[] getFacts() {
         return facts;
     }

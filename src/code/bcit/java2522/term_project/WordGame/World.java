@@ -1,51 +1,67 @@
 package bcit.java2522.term_project.WordGame;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.io.*;
+import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-import java.io.File;
+import java.util.stream.Stream;
+
+
 /**
  * Represents all the country data.
  * @author Umanga Bajgai
  */
-public class World {
+public class World
+{
 
+
+//    final private Map<Country, String> countries;
     public World()
     {
-        createCountries();
+        final Path dir = Path.of("countries");
+
+//        countries = new HashMap<>();
+
+        createCountries(dir);
     }
 
-    /**
-     * Creates country objects, based on data in resource files.
-     *
-     */
-    private void createCountries()
+    private void createCountries(final Path dir)
     {
-        final String resourceDirectory;
-        final String fileEnding;
-        String relativePath;
-        String currentFile;
+        //getting the file names in the directory.
 
-        char currentFileChar;
-        File countryFile;
-
-        resourceDirectory = "src/resources/";
-        fileEnding = ".txt";
-        currentFileChar = 'a';
-
-        for (int i = 'a'; i < 'z'; i++)
+        try(final Stream <Path> dirFileNames = Files.list(dir))
         {
-            relativePath = resourceDirectory + currentFileChar + fileEnding;
-            countryFile = new File(relativePath);
-
-            //for-each of the files, we need to create a country object for it.
-
-
-            currentFileChar+=1;
+            dirFileNames.forEach(this::createCountry);
+        }
+        catch(java.io.IOException e) {
+            System.out.println(e + "");
         }
 
+    }
 
+    private void createCountry(Path dir)
+    {
+        //create a buffered reader and read the file.
 
+        Boolean countryAndCapital;
+        try (BufferedReader bufferedReader = Files.newBufferedReader(dir))
+        {
+            final Stream<String> lines;
+            lines = bufferedReader.lines();
+            if (lines == null)
+            {
+                return;
+            }
+            lines.
+                //then facts stored in country array list.
+                //if line is a new line/ just white space we know next line is country: captial city.
+
+        }
+        catch(java.io.IOException e)
+        {
+            System.out.println("Error \"" + e + "\" could not be located." );
+        }
     }
 
 }
