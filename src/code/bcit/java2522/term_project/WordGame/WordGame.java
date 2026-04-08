@@ -7,7 +7,7 @@ public class WordGame
 {
     public static void wordGame()
     {
-        System.out.println("wordGame");
+        World world = new World();
     }
 
 }

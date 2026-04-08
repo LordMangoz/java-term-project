@@ -49,7 +49,6 @@ public class Country
             name.isEmpty())
         {
             throw new IllegalArgumentException("Invalid name.");
-
         }
     }
 
@@ -63,7 +62,7 @@ public class Country
     private void validateCapitalCityName(final String capitalCityName)
     {
         if( capitalCityName == null ||
-                capitalCityName.isEmpty())
+            capitalCityName.isEmpty())
         {
             throw new IllegalArgumentException("Invalid name.");
 
