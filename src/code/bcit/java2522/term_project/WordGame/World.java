@@ -2,10 +2,7 @@ package bcit.java2522.term_project.WordGame;
 
 import java.io.*;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.stream.Collectors;
+import java.util.*;
 import java.util.stream.Stream;
 
 
@@ -15,20 +12,25 @@ import java.util.stream.Stream;
  */
 public class World
 {
+    //the key is the country name, and stores a country object.
+    private final Map<String, Country> countryHashMap;
 
 
-//    final private Map<Country, String> countries;
+    //    final private Map<Country, String> countries;
     public World()
     {
         final Path dir = Path.of("src","resources", "countries").toAbsolutePath();
-//        countries = new HashMap<>();
+
+        countryHashMap = new HashMap<>();
+
         createCountries(dir);
+
     }
 
     private void createCountries(final Path dir)
     {
-        System.out.println("full directory: " + dir.toAbsolutePath());
-        System.out.println("exist status of directory" + Files.exists(dir));
+//        System.out.println("full directory: " + dir.toAbsolutePath());
+//        System.out.println("exist status of directory" + Files.exists(dir));
 
         //getting the file names in the directory.
         try(final Stream <Path> dirFileNames = Files.list(dir))
@@ -52,41 +54,23 @@ public class World
             linesArr = new ArrayList<String>();
             bufferedReader.lines().forEach(linesArr::add);
 
-            ArrayList<String> countryDataList;
-//            countryDataList =  linesArr.stream().
-//                                filter(x -> (x.contains(":") && !x.contains(".") &&
-//                                !(linesArr.get(linesArr.indexOf(x)+1).isEmpty()) &&
-//                                !(linesArr.get(linesArr.indexOf(x)+2).isEmpty()) &&
-//                                !(linesArr.get(linesArr.indexOf(x)+3).isEmpty()))).
-//                                collect(Collectors.toCollection(ArrayList::new));
-//
-//            countryDataList.forEach(System.out::println);
-
-//            linesArr.stream().forEach(x -> {
-//                if ((x.contains(":") && !x.contains(".")))
-//                {
-//                    makeCountry((ArrayList<String>) linesArr.subList(linesArr.indexOf(x), linesArr.indexOf(x+3)));
-//                    System.out.println();
-//                }
-//            });
             String currentLine;
             ArrayList<String> currentCountryList;
-            System.out.println("\n\n\n\n\ncurrentFilePath" + filePath.toString());
+//            System.out.println("\n\n\n\n\ncurrentFilePath" + filePath.toString());
             for (int i = 0; i < linesArr.size(); i++)
             {
                 currentLine = linesArr.get(i);
                 if (currentLine.contains(":") && !(currentLine.contains(".")))
                 {
-
-                    currentCountryList = new ArrayList<>(linesArr.subList(i, i+3));
+                    if(i+4 <= linesArr.size()) {
+                    currentCountryList = new ArrayList<>(linesArr.subList(i, i+4));
                     makeCountry(currentCountryList);
-                    System.out.println("iteration Number:" + i);
-                    System.out.println(currentCountryList.toString());
+                    }
                 }
             }
 
             //need to grab the block of country.
-            //then run command to create country ( another method lol)
+            //then run run functoin to crate country
             // just checks if the assignment ends up with a null result, telling us we reached the end of the file.
 
         }
@@ -98,8 +82,49 @@ public class World
 
     private void makeCountry(final ArrayList<String> countryData)
     {
+        String countryName = null;
+        String capitalName = null;
+        final String[] facts;
+        final Map<String, Country> hashmap;
+
+        int colonPosition;
+        hashmap = countryHashMap;
+        facts = new String[3];
+        int factsCounter = 0;
+
+        for (String line : countryData)
+        {
+            //parse for country name and capital and initialize them.
+            if (line == null)
+            {
+                continue;
+            }
+            if ((line.contains(":") && !line.contains(".")))
+            {
+                colonPosition = line.indexOf(":");
+
+                countryName = line.substring(0, colonPosition).trim();
+                capitalName = line.substring(colonPosition + 1).trim();
+//                System.out.println(countryName + capitalName);
+                continue;
+            }
+            if(!line.isBlank())
+            {
+                facts[factsCounter] = line;
+                factsCounter++;
+            }
+
+            if( capitalName != null &&
+                factsCounter == 3)
+            {
+                hashmap.put(countryName, new Country(countryName, capitalName, facts));
+            }
+        }
 
     }
 
+    public Map<String, Country> getCountryHashMap() {
+        return countryHashMap;
+    }
 
 }

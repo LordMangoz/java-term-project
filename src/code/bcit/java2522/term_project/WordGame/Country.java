@@ -69,6 +69,11 @@ public class Country
         }
     }
 
+    public String getCountryName()
+    {
+        return name;
+    }
+
 
     /**
      * Gets for the capital city name.
@@ -80,14 +85,7 @@ public class Country
         return capitalCityName;
     }
 
-    /**
-     * Gets the country name.
-     *
-     * @return name of country
-     */
-    public String getName() {
-        return name;
-    }
+
 
     /**
      * Getter for country facts.
@@ -96,5 +94,8 @@ public class Country
      */
     public String[] getFacts() {
         return facts;
+    }
+    public String getFact(final int index) {
+        return facts[index];
     }
 }
