@@ -38,37 +38,40 @@ public class Main {
 
     }
 
-
     private static void menu()
     {
-        System.out.println("------ menu ------");
-        System.out.println("Press W to play the Word game.");
-        System.out.println("Press N to play the Number game.");
-        System.out.println("Press M to play the nameOfGameHere.");
-        System.out.println("Press Q to quit.");
-        System.out.println("------------------");
+        boolean stopSignal;
+        stopSignal = false;
 
-        char userInput;
-        userInput = scan.next().toLowerCase().charAt(0);
-
-        switch (userInput)
+        while (!stopSignal)
         {
-            case wordGameInput:
-                WordGame.wordGame();
-                break;
-            case numberGameInput:
-                NumberGame.numberGame();
-                break;
-            case nameOfGameHereInput:
-                MyGame.myGame();
-                break;
-            case quitInput:
-                System.out.println("Thanks for playing!");
-                break;
-            default:
-                System.out.println("Invalid Input: '" + userInput + "' try again." );
-                menu();
-        }
+            System.out.println("------ menu ------");
+            System.out.println("Press W to play the Word game.");
+            System.out.println("Press N to play the Number game.");
+            System.out.println("Press M to play the nameOfGameHere.");
+            System.out.println("Press Q to quit.");
+            System.out.println("------------------");
 
+            String rawInput;
+            char userInput;
+            rawInput =  scan.nextLine().trim().toLowerCase();
+            if (rawInput.isEmpty())
+            {
+                continue;
+            }
+            userInput = rawInput.charAt(0);
+
+            switch (userInput)
+            {
+                case wordGameInput -> WordGame.wordGame(scan);
+                case numberGameInput -> NumberGame.numberGame();
+                case nameOfGameHereInput -> MyGame.myGame(scan);
+                case quitInput -> {
+                    System.out.println("Thanks for playing!");
+                    stopSignal = true;
+                }
+                default -> System.out.println("Invalid Input: '" + userInput + "' try again.");
+            }
+        }
     }
 }

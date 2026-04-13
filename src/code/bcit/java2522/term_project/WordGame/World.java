@@ -43,85 +43,44 @@ public class World
 
     }
 
-    private void getCountry(Path filePath)
-    {
-
-        try (BufferedReader bufferedReader = Files.newBufferedReader(filePath))
-        {
+    private void getCountry(final Path filePath) {
+        try (BufferedReader bufferedReader = Files.newBufferedReader(filePath)) {
             final List<String> linesArr;
-            final Stream<String> CountryArr;
+            linesArr = new ArrayList<>();
+            bufferedReader.lines()
+                    .map(String::trim)
+                    .filter(line -> !line.isBlank())
+                    .forEach(linesArr::add);
 
-            linesArr = new ArrayList<String>();
-            bufferedReader.lines().forEach(linesArr::add);
-
-            String currentLine;
-            ArrayList<String> currentCountryList;
-//            System.out.println("\n\n\n\n\ncurrentFilePath" + filePath.toString());
-            for (int i = 0; i < linesArr.size(); i++)
-            {
-                currentLine = linesArr.get(i);
-                if (currentLine.contains(":") && !(currentLine.contains(".")))
-                {
-                    if(i+4 <= linesArr.size()) {
-                    currentCountryList = new ArrayList<>(linesArr.subList(i, i+4));
-                    makeCountry(currentCountryList);
-                    }
-                }
+            for (int i = 0; i + 3 < linesArr.size(); i += 4) {
+                makeCountry(new ArrayList<>(linesArr.subList(i, i + 4)));
             }
-
-            //need to grab the block of country.
-            //then run run functoin to crate country
-            // just checks if the assignment ends up with a null result, telling us we reached the end of the file.
-
-        }
-        catch(java.io.IOException e)
-        {
-            System.out.println("Error \"" + e + "\" could not be located." );
+        } catch (IOException e) {
+            System.out.println("Error \"" + e + "\" could not be located.");
         }
     }
 
     private void makeCountry(final ArrayList<String> countryData)
     {
-        String countryName = null;
-        String capitalName = null;
-        final String[] facts;
-        final Map<String, Country> hashmap;
+        final String headerLine = countryData.get(0);
 
-        int colonPosition;
-        hashmap = countryHashMap;
-        facts = new String[3];
-        int factsCounter = 0;
-
-        for (String line : countryData)
+        final int colonPosition = headerLine.indexOf(':');
+        if (colonPosition == -1)
         {
-            //parse for country name and capital and initialize them.
-            if (line == null)
-            {
-                continue;
-            }
-            if ((line.contains(":") && !line.contains(".")))
-            {
-                colonPosition = line.indexOf(":");
-
-                countryName = line.substring(0, colonPosition).trim();
-                capitalName = line.substring(colonPosition + 1).trim();
-//                System.out.println(countryName + capitalName);
-                continue;
-            }
-            if(!line.isBlank())
-            {
-                facts[factsCounter] = line;
-                factsCounter++;
-            }
-
-            if( capitalName != null &&
-                factsCounter == 3)
-            {
-                hashmap.put(countryName, new Country(countryName, capitalName, facts));
-            }
+            return;
         }
 
+        final String countryName = headerLine.substring(0, colonPosition).trim();
+        final String capitalName = headerLine.substring(colonPosition + 1).trim();
+
+        final String[] facts = new String[3];
+        facts[0] = countryData.get(1).trim();
+        facts[1] = countryData.get(2).trim();
+        facts[2] = countryData.get(3).trim();
+
+        countryHashMap.put(countryName, new Country(countryName, capitalName, facts));
     }
+
 
     public Map<String, Country> getCountryHashMap() {
         return countryHashMap;
