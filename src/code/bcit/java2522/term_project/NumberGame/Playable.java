@@ -12,6 +12,7 @@ public interface Playable
      * Starts the game session.
      */
     void play();
+
     /**
      * Ends the session.
      */

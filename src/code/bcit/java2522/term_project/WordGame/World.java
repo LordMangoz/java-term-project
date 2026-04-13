@@ -1,89 +1,159 @@
 package bcit.java2522.term_project.WordGame;
 
-import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
-
 /**
- * Represents all the country data.
+ * Represents all the country data used in the WordGame.
+ * Loads countries from text files stored in the resources folder.
+ *
  * @author Umanga Bajgai
+ * @version 1.0
  */
 public class World
 {
-    //the key is the country name, and stores a country object.
+    /** Directory containing country data files. */
+    private static final Path COUNTRY_DIRECTORY =
+            Path.of("src", "resources", "countries").toAbsolutePath();
+
+    /** Index for the first element. */
+    private static final int FIRST_INDEX = 0;
+
+    /** Offset for the next index. */
+    private static final int NEXT_INDEX_OFFSET = 1;
+
+    /** Number of facts per country. */
+    private static final int FACT_COUNT = 3;
+
+    /** Total number of lines per country entry. */
+    private static final int COUNTRY_ENTRY_LINES = 4;
+
+    /** Header line index. */
+    private static final int HEADER_INDEX = 0;
+
+    /** Fact line 1 index. */
+    private static final int FACT_ONE_INDEX = 1;
+
+    /** Fact line 2 index. */
+    private static final int FACT_TWO_INDEX = 2;
+
+    /** Fact line 3 index. */
+    private static final int FACT_THREE_INDEX = 3;
+
+    /** Index for the first fact in the facts array. */
+    private static final int FACT_ARRAY_FIRST_INDEX = 0;
+
+    /** Index for the second fact in the facts array. */
+    private static final int FACT_ARRAY_SECOND_INDEX = 1;
+
+    /** Index for the third fact in the facts array. */
+    private static final int FACT_ARRAY_THIRD_INDEX = 2;
+
+    /** Stores all countries. Key is the country name. */
     private final Map<String, Country> countryHashMap;
 
-
-    //    final private Map<Country, String> countries;
+    /**
+     * Constructs a World and loads all countries into the HashMap.
+     */
     public World()
     {
-        final Path dir = Path.of("src","resources", "countries").toAbsolutePath();
-
         countryHashMap = new HashMap<>();
-
-        createCountries(dir);
-
+        createCountries(COUNTRY_DIRECTORY);
     }
 
+    /*
+     * Reads all country files in the given directory and loads them into the HashMap.
+     */
     private void createCountries(final Path dir)
     {
-//        System.out.println("full directory: " + dir.toAbsolutePath());
-//        System.out.println("exist status of directory" + Files.exists(dir));
-
-        //getting the file names in the directory.
-        try(final Stream <Path> dirFileNames = Files.list(dir))
+        try (Stream<Path> dirFileNames = Files.list(dir))
         {
             dirFileNames.forEach(this::getCountry);
         }
-        catch(java.io.IOException e) {
-            System.out.println(e + " error from createCountries");
+        catch (final IOException e)
+        {
+            System.out.println("Error: could not load country directory.");
         }
-
     }
 
-    private void getCountry(final Path filePath) {
-        try (BufferedReader bufferedReader = Files.newBufferedReader(filePath)) {
-            final List<String> linesArr;
-            linesArr = new ArrayList<>();
+    /*
+     * Reads one file and extracts all country entries from it.
+     */
+    private void getCountry(final Path filePath)
+    {
+        final List<String> linesArr;
+
+        linesArr = new ArrayList<>();
+
+        try (BufferedReader bufferedReader = Files.newBufferedReader(filePath))
+        {
             bufferedReader.lines()
                     .map(String::trim)
                     .filter(line -> !line.isBlank())
                     .forEach(linesArr::add);
 
-            for (int i = 0; i + 3 < linesArr.size(); i += 4) {
-                makeCountry(new ArrayList<>(linesArr.subList(i, i + 4)));
+            for (int i = FIRST_INDEX;
+                 i + FACT_COUNT < linesArr.size();
+                 i += COUNTRY_ENTRY_LINES)
+            {
+                makeCountry(new ArrayList<>(linesArr.subList(i, i + COUNTRY_ENTRY_LINES)));
             }
-        } catch (IOException e) {
-            System.out.println("Error \"" + e + "\" could not be located.");
+        }
+        catch (final IOException e)
+        {
+            System.out.println("Error: could not read file " + filePath.getFileName());
         }
     }
 
+    /*
+     * Creates a Country object from a list of lines and stores it in the HashMap.
+     *
+     * Expected format:
+     *  Line 1: CountryName: CapitalName
+     *  Line 2-4: Facts
+     */
     private void makeCountry(final ArrayList<String> countryData)
     {
-        final String headerLine = countryData.get(0);
+        final String headerLine;
+        final int colonPosition;
 
-        final int colonPosition = headerLine.indexOf(':');
+        headerLine = countryData.get(HEADER_INDEX);
+        colonPosition = headerLine.indexOf(':');
+
         if (colonPosition == -1)
         {
             return;
         }
 
-        final String countryName = headerLine.substring(0, colonPosition).trim();
-        final String capitalName = headerLine.substring(colonPosition + 1).trim();
+        final String countryName;
+        final String capitalName;
+        final String[] facts;
 
-        final String[] facts = new String[3];
-        facts[0] = countryData.get(1).trim();
-        facts[1] = countryData.get(2).trim();
-        facts[2] = countryData.get(3).trim();
+        countryName = headerLine.substring(FIRST_INDEX, colonPosition).trim();
+        capitalName = headerLine.substring(colonPosition + NEXT_INDEX_OFFSET).trim();
+
+        facts = new String[FACT_COUNT];
+        facts[FACT_ARRAY_FIRST_INDEX] = countryData.get(FACT_ONE_INDEX).trim();
+        facts[FACT_ARRAY_SECOND_INDEX] = countryData.get(FACT_TWO_INDEX).trim();
+        facts[FACT_ARRAY_THIRD_INDEX] = countryData.get(FACT_THREE_INDEX).trim();
 
         countryHashMap.put(countryName, new Country(countryName, capitalName, facts));
     }
 
-
-    public Map<String, Country> getCountryHashMap() {
+    /**
+     * Gets the HashMap containing all countries.
+     *
+     * @return the HashMap of countries
+     */
+    public Map<String, Country> getCountryHashMap()
+    {
         return countryHashMap;
     }
-
 }

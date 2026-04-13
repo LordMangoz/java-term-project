@@ -1,7 +1,11 @@
 package bcit.java2522.term_project.WordGame;
 
 /**
- * Country
+ * Represents a Country used in the WordGame.
+ * Stores the country name, its capital city name, and facts.
+ *
+ * @author Umanga Bajgai
+ * @version 1.0
  */
 public class Country
 {
@@ -9,12 +13,19 @@ public class Country
     private final String capitalCityName;
     private final String[] facts;
 
-
-    Country(final String name, final String capitalCityName, final String[] facts)
+    /**
+     * Constructs a Country.
+     *
+     * @param name the name of the country
+     * @param capitalCityName the capital city name of the country
+     * @param facts the facts about the country
+     */
+    public Country(final String name,
+                   final String capitalCityName,
+                   final String[] facts)
     {
-
-        validateCapitalCityName(capitalCityName);
         validateName(name);
+        validateCapitalCityName(capitalCityName);
         validateFacts(facts);
 
         this.name = name;
@@ -23,79 +34,89 @@ public class Country
     }
 
     /*
-    * Validates the Facts
-    *
-    * Constraints
-    *   - Cannot be null.
-    */
+     * Validates the facts array.
+     *
+     * Constraints:
+     *  - Cannot be null.
+     */
     private void validateFacts(final String[] facts)
     {
         if (facts == null)
         {
-            throw new IllegalArgumentException("Cannot be Null");
+            throw new IllegalArgumentException("Facts cannot be null.");
         }
     }
 
     /*
-    * Validate the names.
-    *
-    * Constraints
-    *  - Cannot be null.
-    *  - Cannot empty.
-    */
+     * Validates the country name.
+     *
+     * Constraints:
+     *  - Cannot be null.
+     *  - Cannot be empty.
+     */
     private void validateName(final String name)
     {
-        if( name == null ||
+        if (name == null ||
             name.isEmpty())
         {
-            throw new IllegalArgumentException("Invalid name.");
+            throw new IllegalArgumentException("Invalid country name.");
         }
     }
 
     /*
-    * Validates the capital city name
-    *
-    * Constraints
-    *  - Cannot be null
-    *  - Cannot be empty.
-    */
+     * Validates the capital city name.
+     *
+     * Constraints:
+     *  - Cannot be null.
+     *  - Cannot be empty.
+     */
     private void validateCapitalCityName(final String capitalCityName)
     {
-        if( capitalCityName == null ||
+        if (capitalCityName == null ||
             capitalCityName.isEmpty())
         {
-            throw new IllegalArgumentException("Invalid name.");
-
+            throw new IllegalArgumentException("Invalid capital city name.");
         }
     }
 
+    /**
+     * Gets the country name.
+     *
+     * @return the country name
+     */
     public String getCountryName()
     {
         return name;
     }
 
-
     /**
-     * Gets for the capital city name.
+     * Gets the capital city name.
      *
-     * @return capitalCityName of the country.
+     * @return the capital city name
      */
     public String getCapitalCityName()
     {
         return capitalCityName;
     }
 
-
-
     /**
-     * Getter for country facts.
+     * Gets the facts about the country.
      *
-     * @return facts about country.
+     * @return the facts array
      */
-    public String[] getFacts() {
+    public String[] getFacts()
+    {
         return facts;
     }
-    public String getFact(final int index) {
+
+    /**
+     * Gets a specific fact about the country.
+     *
+     * @param index the fact index
+     * @return the fact at the given index
+     */
+    public String getFact(final int index)
+    {
         return facts[index];
     }
 }

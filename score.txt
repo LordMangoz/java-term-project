@@ -76,3 +76,45 @@ Correct First Attempts: 0
 Correct Second Attempts: 0
 Incorrect Attempts: 0
 Score: 0 points
+Date and Time: 2026-04-12 22:20:26
+Games Played: 0
+Correct First Attempts: 0
+Correct Second Attempts: 0
+Incorrect Attempts: 0
+Score: 0 points
+Date and Time: 2026-04-12 23:02:30
+Games Played: 1
+Correct First Attempts: 0
+Correct Second Attempts: 0
+Incorrect Attempts: 10
+Score: 0 points
+Date and Time: 2026-04-12 23:03:14
+Games Played: 1
+Correct First Attempts: 2
+Correct Second Attempts: 0
+Incorrect Attempts: 8
+Score: 4 points
+Date and Time: 2026-04-12 23:18:41
+Games Played: 1
+Correct First Attempts: 0
+Correct Second Attempts: 0
+Incorrect Attempts: 10
+Score: 0 points
+Date and Time: 2026-04-12 23:20:44
+Games Played: 1
+Correct First Attempts: 0
+Correct Second Attempts: 1
+Incorrect Attempts: 9
+Score: 1 points
+Date and Time: 2026-04-12 23:29:08
+Games Played: 0
+Correct First Attempts: 0
+Correct Second Attempts: 0
+Incorrect Attempts: 0
+Score: 0 points
+Date and Time: 2026-04-12 23:53:04
+Games Played: 1
+Correct First Attempts: 0
+Correct Second Attempts: 0
+Incorrect Attempts: 10
+Score: 0 points

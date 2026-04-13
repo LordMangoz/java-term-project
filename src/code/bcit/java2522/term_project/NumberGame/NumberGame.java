@@ -1,343 +1,160 @@
 package bcit.java2522.term_project.NumberGame;
 
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.util.random.RandomGenerator;
 
 /**
- * NumberGame is a JavaFX game where the user must place 20 random numbers
- * into a 4x5 grid in ascending order.
+ * Represents the NumberGame logic.
  *
  * @author Umanga Bajgai
  * @version 1.0
  */
-public class NumberGame extends Application
+public class NumberGame extends Game
 {
-    private static final int ROWS;
-    private static final int COLS;
-    private static final int GRID_SIZE;
+    /** Total number of slots in the grid. */
+    private static final int GRID_SIZE = 20;
 
-    private static final int MIN_NUMBER;
-    private static final int MAX_NUMBER;
+    /** Minimum number that can be generated. */
+    private static final int MIN_NUMBER = 1;
 
-    private static final int WINDOW_WIDTH_PX;
-    private static final int WINDOW_HEIGHT_PX;
+    /** Maximum number that can be generated. */
+    private static final int MAX_NUMBER = 1000;
 
-    private static final int BUTTON_WIDTH_PX;
-    private static final int BUTTON_HEIGHT_PX;
+    private static final int EMPTY_SLOTS = 0;
+    private static final int FIRST_INDEX = 0;
+    private static final int NEXT_INDEX_OFFSET = 1;
 
-    private static final String WINDOW_TITLE;
-    private static final String EMPTY_SLOT_TEXT;
+    /** Random number source. */
+    private static final RandomGenerator RANDOM = RandomGenerator.getDefault();
+    private static final int NO_GAMES_PLAYED = 0;
 
-    private static final String TRY_AGAIN_TEXT;
-    private static final String QUIT_TEXT;
-
-    private static final RandomGenerator RANDOM;
-
-    private static boolean javafxStarted;
-
-    static
-    {
-        ROWS = 4;
-        COLS = 5;
-        GRID_SIZE = ROWS * COLS;
-
-        MIN_NUMBER = 1;
-        MAX_NUMBER = 1000;
-
-        WINDOW_WIDTH_PX = 600;
-        WINDOW_HEIGHT_PX = 400;
-
-        BUTTON_WIDTH_PX = 90;
-        BUTTON_HEIGHT_PX = 60;
-
-        WINDOW_TITLE = "Number Game";
-        EMPTY_SLOT_TEXT = "-";
-
-        TRY_AGAIN_TEXT = "Try Again";
-        QUIT_TEXT = "Quit";
-
-        RANDOM = RandomGenerator.getDefault();
-        javafxStarted = false;
-    }
-
-    private final Integer[] placedNumbers;
-    private final Button[] buttons;
-
+    /* Current number that must be placed. */
     private int currentNumber;
+
+    /* Number of filled slots in the current round. */
     private int filledSlots;
 
-    private int gamesPlayed;
-    private int gamesWon;
-    private int gamesLost;
+    /* Total successful placements across all rounds. */
     private int totalPlacements;
 
-    private Label currentNumberLabel;
-    private Stage stage;
+    /* Tracks whether the current round has ended. */
+    private boolean gameEnded;
+
+    /* Stores the placed numbers. Null means empty slot. */
+    private final Integer[] placedNumbers;
 
     /**
      * Constructs a NumberGame.
      */
     public NumberGame()
     {
-        currentNumber = 0;
-        filledSlots = 0;
-        gamesPlayed = 0;
-        gamesWon = 0;
-        gamesLost = 0;
-        totalPlacements = 0;
         placedNumbers = new Integer[GRID_SIZE];
-        buttons = new Button[GRID_SIZE];
+        resetGame();
     }
 
     /**
-     * Entry point into the NumberGame program.
-     * Starts JavaFX once, then uses Platform.runLater after.
+     * Resets the game state for a new round.
      */
-    public static void numberGame()
-    {
-        if (!javafxStarted)
-        {
-            javafxStarted = true;
-            Platform.startup(NumberGame::launchGame);
-        }
-        else
-        {
-            Platform.runLater(NumberGame::launchGame);
-        }
-    }
-
-    /**
-     * Starts the JavaFX stage.
-     *
-     * @param stage the primary stage
-     */
-    @Override
-    public void start(final Stage stage)
-    {
-        final VBox root;
-        final GridPane grid;
-        final Scene scene;
-
-        this.stage = stage;
-
-        currentNumberLabel = new Label();
-
-        grid = new GridPane();
-        buildGrid(grid);
-
-        root = new VBox();
-        root.getChildren().add(currentNumberLabel);
-        root.getChildren().add(grid);
-
-        startNewRound();
-
-        scene = new Scene(root, WINDOW_WIDTH_PX, WINDOW_HEIGHT_PX);
-
-        stage.setOnCloseRequest(event ->
-        {
-            event.consume();
-            exitProcedure();
-        });
-
-        stage.setTitle(WINDOW_TITLE);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    /**
-     * Launches the game.
-     */
-    private static void launchGame()
-    {
-        final NumberGame game;
-        final Stage stage;
-
-        game = new NumberGame();
-        stage = new Stage();
-
-        try
-        {
-            game.start(stage);
-        }
-        catch (final Exception exception)
-        {
-            System.out.println(exception);
-        }
-    }
-
-    /**
-     * Builds the 4x5 grid of buttons.
-     *
-     * @param grid the GridPane
-     */
-    private void buildGrid(final GridPane grid)
+    public void resetGame()
     {
         int index;
-        index = 0;
 
-        for (int row = 0; row < ROWS; row++)
+        gameEnded = false;
+        filledSlots = EMPTY_SLOTS;
+
+        for (index = FIRST_INDEX; index < GRID_SIZE; index++)
         {
-            for (int col = 0; col < COLS; col++)
-            {
-                final int buttonIndex;
-                final Button button;
-
-                buttonIndex = index;
-
-                button = new Button(EMPTY_SLOT_TEXT);
-                button.setMinWidth(BUTTON_WIDTH_PX);
-                button.setMinHeight(BUTTON_HEIGHT_PX);
-
-                button.setOnAction(event -> placeNumber(buttonIndex));
-
-                buttons[index] = button;
-                grid.add(button, col, row);
-
-                index++;
-            }
-        }
-    }
-
-    /**
-     * Starts a new game round.
-     */
-    private void startNewRound()
-    {
-        filledSlots = 0;
-
-        for (int i = 0; i < GRID_SIZE; i++)
-        {
-            placedNumbers[i] = null;
-            buttons[i].setText(EMPTY_SLOT_TEXT);
-            buttons[i].setDisable(false);
+            placedNumbers[index] = null;
         }
 
         generateNextNumber();
-        refreshButtonStates();
     }
 
     /**
      * Generates the next random number.
      */
-    private void generateNextNumber()
+    public void generateNextNumber()
     {
         currentNumber = RANDOM.nextInt(MIN_NUMBER, MAX_NUMBER + 1);
-        currentNumberLabel.setText("Current number: " + currentNumber);
     }
 
     /**
-     * Handles placing the number into a chosen slot.
+     * Gets the current number.
      *
-     * @param index the button index
+     * @return the current number
      */
-    private void placeNumber(final int index)
+    public int getCurrentNumber()
     {
+        return currentNumber;
+    }
+
+    /**
+     * Gets the placed numbers.
+     *
+     * @return the placed numbers array
+     */
+    public Integer[] getPlacedNumbers()
+    {
+        return placedNumbers;
+    }
+
+    /**
+     * Attempts to place the current number at the given index.
+     *
+     * @param index the grid index
+     * @return true if the placement succeeded
+     */
+    public boolean placeNumber(final int index)
+    {
+        if (index < FIRST_INDEX ||
+            index >= GRID_SIZE)
+        {
+            return false;
+        }
+
         if (placedNumbers[index] != null)
         {
-            return;
+            return false;
         }
 
         if (!isLegalPlacement(index, currentNumber))
         {
-            return;
+            return false;
         }
 
         placedNumbers[index] = currentNumber;
-        buttons[index].setText(String.valueOf(currentNumber));
-        buttons[index].setDisable(true);
-
         filledSlots++;
         totalPlacements++;
 
         if (filledSlots == GRID_SIZE)
         {
-            gamesPlayed++;
-            gamesWon++;
-            showEndDialog(true);
-            return;
-        }
-
-        generateNextNumber();
-        refreshButtonStates();
-
-        if (!hasLegalMove())
-        {
-            gamesPlayed++;
-            gamesLost++;
-            showEndDialog(false);
-        }
-    }
-
-    /**
-     * Checks if the placement keeps the grid ascending.
-     *
-     * @param index slot index
-     * @param value number being placed
-     * @return true if valid
-     */
-    private boolean isLegalPlacement(final int index, final int value)
-    {
-        int leftIndex;
-        int rightIndex;
-        leftIndex = index - 1;
-        while (leftIndex >= 0 && placedNumbers[leftIndex] == null)
-        {
-            leftIndex--;
-        }
-
-        if (leftIndex >= 0 && placedNumbers[leftIndex] > value)
-        {
-            return false;
-        }
-
-        rightIndex = index + 1;
-        while (rightIndex < GRID_SIZE && placedNumbers[rightIndex] == null)
-        {
-            rightIndex++;
-        }
-
-        if (rightIndex < GRID_SIZE && placedNumbers[rightIndex] < value)
-        {
-            return false;
+            recordWin();
+            gameEnded = true;
         }
 
         return true;
     }
 
     /**
-     * Updates button enabled/disabled state depending on legal moves.
+     * Checks whether the current round is won.
+     *
+     * @return true if the round is won
      */
-    private void refreshButtonStates()
+    public boolean isGameWon()
     {
-        for (int i = 0; i < GRID_SIZE; i++)
-        {
-            if (placedNumbers[i] == null)
-            {
-                buttons[i].setDisable(!isLegalPlacement(i, currentNumber));
-            }
-        }
+        return filledSlots == GRID_SIZE;
     }
 
     /**
-     * Checks if there is any legal placement available.
-     *
-     * @return true if a move exists
+     * Checks if there is a legal placement for the current number.
+     * @return true if a legal move exists.
      */
-    private boolean hasLegalMove()
+    public boolean hasLegalMove()
     {
         for (int i = 0; i < GRID_SIZE; i++)
         {
-            if (placedNumbers[i] == null && isLegalPlacement(i, currentNumber))
+            if (placedNumbers[i] == null &&
+                isLegalPlacement(i, currentNumber))
             {
                 return true;
             }
@@ -347,85 +164,92 @@ public class NumberGame extends Application
     }
 
     /**
-     * Shows win/loss popup and asks retry or quit.
+     * Checks whether placing a value at the given index preserves order.
      *
-     * @param won true if player won
+     * @param index the grid index
+     * @param value the value to test
+     *
+     * @return true if the placement is legal
      */
-    private void showEndDialog(final boolean won)
+    public boolean isLegalPlacement(final int index, final int value)
     {
-        final Alert alert;
-        final ButtonType tryAgainButton;
-        final ButtonType quitButton;
-        final ButtonType choice;
+        int leftIndex;
+        int rightIndex;
 
-        alert = new Alert(Alert.AlertType.CONFIRMATION);
-
-        if (won)
+        leftIndex = index - NEXT_INDEX_OFFSET;
+        while (leftIndex >= FIRST_INDEX &&
+                placedNumbers[leftIndex] == null)
         {
-            alert.setTitle("You Win!");
-            alert.setHeaderText("You successfully placed all 20 numbers.");
-        }
-        else
-        {
-            alert.setTitle("Game Over");
-            alert.setHeaderText("No valid placement exists. You lost.");
+            leftIndex--;
         }
 
-        tryAgainButton = new ButtonType(TRY_AGAIN_TEXT);
-        quitButton = new ButtonType(QUIT_TEXT);
-
-        alert.getButtonTypes().setAll(tryAgainButton, quitButton);
-        alert.setContentText(buildScoreText());
-
-        choice = alert.showAndWait().orElse(quitButton);
-
-        if (choice == tryAgainButton)
+        if (leftIndex >= FIRST_INDEX &&
+            placedNumbers[leftIndex] > value)
         {
-            startNewRound();
+            return false;
         }
-        else
+
+        rightIndex = index + NEXT_INDEX_OFFSET;
+
+        while (rightIndex < GRID_SIZE &&
+            placedNumbers[rightIndex] == null)
         {
-            exitProcedure();
+            rightIndex++;
         }
+
+        return rightIndex >= GRID_SIZE ||
+               placedNumbers[rightIndex] >= value;
     }
 
+
     /**
-     * Builds the score summary.
+     * Builds the score summary text.
      *
-     * @return score string
+     * @return the score summary
      */
-    private String buildScoreText()
+    public String buildScoreText()
     {
         final double average;
+        final int gamesPlayed;
 
-        if (gamesPlayed == 0)
+        gamesPlayed = getGamesPlayed();
+
+        if (gamesPlayed == NO_GAMES_PLAYED)
         {
-            average = 0.0;
+            average = NO_GAMES_PLAYED;
         }
         else
         {
             average = (double) totalPlacements / gamesPlayed;
         }
 
-        return "You won " + gamesWon + " out of " + gamesPlayed +
-                " games and you lost " + gamesLost + " out of " + gamesPlayed +
+        return "You won " + getGamesWon() + " out of " + gamesPlayed +
+                " games and you lost " + getGamesLost() + " out of " + gamesPlayed +
                 " games, with " + totalPlacements +
                 " successful placements, an average of " + average + " per game.";
     }
 
+
     /**
-     * Shows final score and exits JavaFX.
+     * Starts the game.
      */
-    private void exitProcedure()
+    @Override
+    public void play()
     {
-        final Alert alert;
-
-        alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Final Score");
-        alert.setHeaderText("NumberGame Summary");
-        alert.setContentText(buildScoreText());
-        alert.showAndWait();
-
-        stage.close();
+        resetGame();
     }
+
+    /**
+     * Ends the game.
+     */
+    @Override
+    public void stopPlaying()
+    {
+        if (!gameEnded)
+        {
+            recordLoss();
+            gameEnded = true;
+        }
+    }
+
 }

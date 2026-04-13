@@ -1,6 +1,7 @@
 package bcit.java2522.term_project;
 
 import bcit.java2522.term_project.NumberGame.NumberGame;
+import bcit.java2522.term_project.NumberGame.NumberGameFx;
 import bcit.java2522.term_project.WordGame.WordGame;
 import bcit.java2522.term_project.MyGame.MyGame;
 
@@ -64,7 +65,7 @@ public class Main {
             switch (userInput)
             {
                 case wordGameInput -> WordGame.wordGame(scan);
-                case numberGameInput -> NumberGame.numberGame();
+                case numberGameInput -> NumberGameFx.numberGame();
                 case nameOfGameHereInput -> MyGame.myGame(scan);
                 case quitInput -> {
                     System.out.println("Thanks for playing!");
